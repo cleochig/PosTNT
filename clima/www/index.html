@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="lerClimas">
+<html lang="en" ng-app="climaApp">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
@@ -9,23 +9,64 @@
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
+    <script src="js/ng-cordova.min.js"></script>
     <!-- your app's js -->
     <script src="js/app.js"></script>
   </head>
-    <body ng-controller="lerClimasCtrl">
+    <body ng-controller="climaCtrl">
         <ion-pane>
-            <ion-header-bar class="bar-dark">
-                <h1 class="title">Climas</h1>
+
+            <ion-header-bar class="bar-positive">
+                <h1 class="title">Clima na cidade de {{name}} </h1>
             </ion-header-bar>
-            <ion-content>
-              <ion-refresher pulling-text="Reload climas" on-refresh="reload()"></ion-refresher>
-                <ion-list>
-                    <ion-item ng-repeat="b in climas">
-                        <h2 ng-bind-html="b.id"></h2>
-                    </ion-item>
-                </ion-list>
-                <ion-infinite-scroll on-infinite="loadMore()" ng-if="deviceReady"></ion-infinite-scroll>
+            <ion-content padding="true" class="has-header">
+                <form>
+
+                    <label class="item item-input" name="latitude">
+                        <span class="input-label">Latitude</span>
+                        <input type="text" readonly value="{{lat}}">
+                    </label>
+                    <label class="item item-input" name="longitude">
+                        <span class="input-label">Longitude</span>
+                        <input type="text" readonly value="{{lon}}">
+                    </label>
+
+                    <label class="item item-input" name="temperatura">
+                        <span class="input-label">Temperatura</span>
+                        <input type="text" readonly value="{{temp}}">
+                    </label>
+
+                    <label class="item item-input" name="umidade">
+                        <span class="input-label">Umidade</span>
+                        <input type="text" readonly value="{{humidity}}">
+                    </label>
+
+                    <label class="item item-input" name="vento">
+                        <span class="input-label">Vento</span>
+                        <input type="text" readonly value="{{speed}}">
+                    </label>
+
+                    <label class="item item-input" name="descricao">
+                        <span class="input-label">Descrição</span>
+                        <input type="text" readonly value="{{description}}">
+                    </label>
+
+                    <label class="item item-input" name="pressao">
+                        <span class="input-label">Pressão</span>
+                        <input type="text" readonly value="{{pressure}}">
+                    </label>
+
+
+                    <span>Ícone da Temperatura no momento</span>
+
+                   <label class="item item-input" name="city">
+                        <span class="input-label">Cidade</span>
+                        <input type="text" placeholder="Informe o nome da cidade" data-ng-model="p_city">
+                    </label>
+
+
+                </form>
+                <button class="button button-positive button-block" ng-click="obterClimaParam(p_city)">Pesquisar</button>
             </ion-content>
         </ion-pane>
   </body>
