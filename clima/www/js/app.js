@@ -24,16 +24,16 @@ function climaCtrl ($scope, obterClimaSvc){
 
     $scope.$on("climaApp.clima", function(_, result) {
 
-        console.log(result.name);
-        console.log(result.sys.country);
-        console.log(result.coord.lat);
-        console.log(result.coord.lon);
-        console.log(result.main.temp);
-        console.log(result.main.humidity);
-        console.log(result.main.pressure);
-        console.log(result.wind.speed);
-        console.log(result.weather.description);
-        console.log(result.weather.icon);
+        console.log("Cidade " + result.name);
+        console.log("Pais " + result.sys.country);
+        console.log("Lat. " + result.coord.lat);
+        console.log("Lon. " + result.coord.lon);
+        console.log("Temp. " + result.main.temp);
+        console.log("humidity " + result.main.humidity);
+        console.log("Pressure " + result.main.pressure);
+        console.log("Speed " + result.wind.speed);
+        console.log("description " + result.weather.description);
+        console.log("icon " + result.weather.icon);
 
         $scope.name = result.name;
         $scope.country = result.sys.country;
@@ -42,15 +42,13 @@ function climaCtrl ($scope, obterClimaSvc){
         $scope.lon = result.coord.lon;
 
         $scope.temp = result.main.temp;
-        $scope.humidity = result.main.humidity;
         $scope.pressure = result.main.pressure;
+        $scope.humidity = result.main.humidity;
 
         $scope.speed = result.wind.speed;
 
         $scope.humidity = result.weather.description;
         $scope.icon = result.weather.icon;
-
-
 
     });
 
