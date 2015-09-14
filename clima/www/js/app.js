@@ -1,20 +1,56 @@
-//Temperatura, Umidade, Vento, nome da cidade, Ícone da Temperatura no momento, pressão, vento, latitude e longitude, Descricao
+var lerClimas = angular.module("lerClimas", ["ionic"]);
 
-var clima = angular.module("clima",["ionic"]);
+lerClimas.service("lerClimasSvc", ["$http", "$rootScope", lerClimasSvc]);
 
-// Declarando o serviço e injetando dependencias
-clima.service("climaSvc",["$http","$rootScope",climaSvc]);
+lerClimas.controller("lerClimasCtrl", ["$scope","$sce","$ionicLoading","$ionicListDelegate","$ionicPlatform","lerClimasSvc", lerClimasCtrl]);
 
-// Declarenaod o controlador e injetando dependencias
-clima.controller("climaCtrl",["$scope","$sce","$ionicLoading","$ionicListDelegate","$ionicPlatform","climaSvc", climaCtrl]);
+function lerClimasCtrl($scope, $sce, $ionicLoading, $ionicListDelegate, $ionicPlatform, lerClimasSvc) {
 
-function climaSvc($http, $rootScope){
+    $ionicLoading.show({template: "Carregando..."});
 
-    this.loadClimas = function(params){
+    $scope.deviceReady = false;
 
-        $http.get("http://api.openweathermap.org/data/2.5/weather?q=?", {params: params}).success(function(result){
-
+    $ionicPlatform.ready(function() {
+        $scope.$apply(function() {
+            $scope.deviceReady = true;
         });
+    });
+
+    $scope.climas = [];
+    $scope.params = {};
+
+    $scope.$on("lerClimas.climas", function(_, result) {
+        result.forEach(function(b) {
+            console.log(b.name);
+            $scope.climas.push({
+                name: b.name,
+
+            });
+        });
+
+	$scope.$broadcast("scroll.infiniteScrollComplete");
+			$scope.$broadcast("scroll.refreshComplete");
+
+	});
+
+    $scope.loadMore = function() {
+        lerClimasSvc.loadClimas($scope.params);
+        $ionicLoading.hide();
+    }
+    $scope.reload = function() {
+        $scope.climas = [];
+        $scope.params = {};
+        lerClimasSvc.loadClimas();
     }
 
+
+}
+
+function lerClimasSvc($http, $rootScope) {
+    this.loadClimas = function(params) {
+        $http.get("http://api.openweathermap.org/data/2.5/weather?q=lins", {params: params})
+            .success(function(result) {
+                $rootScope.$broadcast("lerClimas.climas", result);
+            });
+    }
 }
