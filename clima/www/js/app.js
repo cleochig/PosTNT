@@ -1,19 +1,20 @@
-// Ionic Starter App
+//Temperatura, Umidade, Vento, nome da cidade, Ícone da Temperatura no momento, pressão, vento, latitude e longitude, Descricao
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+var clima = angular.module("clima",["ionic"]);
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+// Declarando o serviço e injetando dependencias
+clima.service("climaSvc",["$http","$rootScope",climaSvc]);
+
+// Declarenaod o controlador e injetando dependencias
+clima.controller("climaCtrl",["$scope","$sce","$ionicLoading","$ionicListDelegate","$ionicPlatform","climaSvc", climaCtrl]);
+
+function climaSvc($http, $rootScope){
+
+    this.loadClimas = function(params){
+
+        $http.get("http://api.openweathermap.org/data/2.5/weather?q=?", {params: params}).success(function(result){
+
+        });
     }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+
+}
