@@ -48,25 +48,32 @@ function climaCtrl ($scope, $cordovaSQLite, obterClimaSvc){
     $scope.params = {q:"Lins"};
     $scope.resultado = "";
 
-    $scope.insert = function(texojson) {
-        var query = "insert into clima (texojson) values (?)";
-        $cordovaSQLite.execute(db,query,[texojson]).then(function(result) {
-            $scope.resultado = "Insert OK.";
-        }, function(error){
-            $scope.resultado = "Insert FAIL!";
-        });
-    }
-
-    $scope.select = function(texojson){
-        var query = "select texojson from clima where texojson = ?";
-        $cordovaSQLite.execute(db,query,[texojson]).then(function(result) {
-            if(result.rows.length > 0){
-                $scope.resultado = result.rows.item(0).texojson + " encontrado.";
-            } else {
-                $scope.resultado = "Texo não encontrado!";
+    $scope.insert = function(textojson) {
+        var query = "insert into clima (textojson) values (?)";
+        $cordovaSQLite.execute(db, query, [texojson]).then(
+            function(result){
+                $scope.resultado = "INSERI COM SUCESSO";
+                console.log("INSERI");
+            }, function(error){
+                $scope.resultado = "FAIO!";
+                console.log(error);
             }
+        ); // fim do then
+    }; // fim do insert
+
+    $scope.select = function(textojson){
+        var query = "select textojson from clima where textojson = ?";
+        $cordovaSQLite.execute(db,query,[textojson]).then(function(result) {
+            if(result.rows.length > 0){
+                $scope.resultado = result.rows.item(0).textojson;
+                console.log("Achei " + result.rows.item(0).textojson);
+            } else {
+                $scope.resultado = "Nao ACHEI";
+                console.log("Nao achei");
+            }
+
         }, function(error){
-            $scope.resultado = "Deu erro!";
+            console.log(error);
         });
     }
 
