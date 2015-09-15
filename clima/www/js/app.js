@@ -88,23 +88,6 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
 
     $scope.$on("climaApp.clima", function(_, result) {
 
-        $scope.name = result.name;
-        $scope.country = result.sys.country;
-        $scope.lat = result.coord.lat;
-        $scope.lon = result.coord.lon;
-        //Convertendo Kelvin para Celsius
-        var tmp = result.main.temp - 273;
-        $scope.temp = tmp.toFixed(2);
-
-        $scope.pressure = result.main.pressure;
-        $scope.humidity = result.main.humidity;
-        $scope.speed = result.wind.speed;
-
-        result.weather.forEach(function(b) {
-            $scope.description =   b.description;
-            $scope.icon        =   "http://openweathermap.org/img/w/"+ b.icon +".png";
-        });
-
         if (result.name!=null){
 
             // Deletando os dados da tabela
@@ -126,8 +109,42 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
                     console.log(error);
                 }
             ); // fim do then
-
         }
+
+        // Buscando os dados na tabela
+        var query = "select textojson from clima";
+        $cordovaSQLite.execute(dbclima,query,[]).then(function(result) {
+            if(result.rows.length > 0){
+
+                var climaJson = JSON.parse(result.rows.item(0).textojson);
+
+                $scope.name = climaJson.name;
+                $scope.country = climaJson.sys.country;
+                $scope.lat = climaJson.coord.lat;
+                $scope.lon = climaJson.coord.lon;
+
+                //Convertendo Kelvin para Celsius
+                var tmp = climaJson.main.temp - 273;
+                $scope.temp = tmp.toFixed(2);
+
+                $scope.pressure = climaJson.main.pressure;
+                $scope.humidity = climaJson.main.humidity;
+                $scope.speed = climaJson.wind.speed;
+
+                climaJson.weather.forEach(function(b) {
+                    $scope.description =   b.description;
+                    $scope.icon        =   "http://openweathermap.org/img/w/"+ b.icon +".png";
+                });
+
+            } else {
+                $scope.resultado = "Nao ACHEI";
+                console.log("Nao achei");
+            }
+
+        }, function(error){
+            console.log(error);
+        });
+
 
     });
 
