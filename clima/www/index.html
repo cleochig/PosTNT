@@ -10,6 +10,7 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
     <script src="js/ng-cordova.min.js"></script>
+    <script src="cordova.js"></script>
     <!-- your app's js -->
     <script src="js/app.js"></script>
   </head>
@@ -34,18 +35,19 @@
 
                     <label class="item item-input" name="temperatura">
                         <span class="input-label">Temperatura</span>
-                        <input type="text" readonly value="{{temp}}">
+                        <img src="{{icon}}">
+                        <input type="text" readonly value="{{temp}} °C">
                     </label>
 
-                    <span>Ícone da Temperatura no momento</span>
+
                     <label class="item item-input" name="umidade">
                         <span class="input-label">Umidade</span>
-                        <input type="text" readonly value="{{humidity}}">
+                        <input type="text" readonly value="{{humidity}} %">
                     </label>
 
                     <label class="item item-input" name="vento">
                         <span class="input-label">Vento</span>
-                        <input type="text" readonly value="{{speed}}">
+                        <input type="text" readonly value="{{speed}} m/s">
                     </label>
 
                     <label class="item item-input" name="descricao">
@@ -55,9 +57,8 @@
 
                     <label class="item item-input" name="pressao">
                         <span class="input-label">Pressão</span>
-                        <input type="text" readonly value="{{pressure}}">
+                        <input type="text" readonly value="{{pressure}} hpa">
                     </label>
-
 
                    <label class="item item-input" name="city">
                         <span class="input-label">Cidade</span>
@@ -65,10 +66,11 @@
                     </label>
 
                     <p>Resposta:: {{resultado}}</p>
+
                 </form>
 
                 <button class="button button-positive button-block" ng-click="obterClimaParam(p_city)">Pesquisar</button>
-                <button class="button button-positive button-block" ng-click="insert(p_city)">Inserir Texo</button>
+                <!--<button class="button button-positive button-block" ng-click="insert(p_city)">Inserir Texo</button>-->
                 <button class="button button-positive button-block" ng-click="select(p_city)">Busca Texo</button>
 
             </ion-content>

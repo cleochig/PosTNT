@@ -1,15 +1,15 @@
 
-
+// Declarand o módulo e injetando dependencias
 var climaApp = angular.module('climaApp',['ionic','ngCordova']);
 
 // Declarando a variavel para criação do banco de dados
-var db = null;
+var dbclima = null;
 
 
 // Criando o serviço e injetando dependencias
-climaApp.service("obterClimaSvc",["$http","$rootScope",obterClimaSvc]);
+climaApp.service("obterClimaSvc",["$http","$rootScope","$ionicLoading",obterClimaSvc]);
 // Criando o Controlador e injetando dependencias
-climaApp.controller("climaCtrl",["$scope","$cordovaSQLite","obterClimaSvc",climaCtrl]);
+climaApp.controller("climaCtrl",["$scope","$sce","$ionicLoading","$ionicPlatform","$cordovaSQLite","obterClimaSvc",climaCtrl]);
 
 climaApp.run(function($ionicPlatform, $cordovaSQLite) {
     $ionicPlatform.ready(function() {
@@ -22,20 +22,26 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
             StatusBar.styleDefault();
         }
 
+        if(window.cordova) {
+            // App syntax
+            dbclima = $cordovaSQLite.openDB("dbclima");
+        } else {
+            // Ionic serve syntax
+            dbclima = window.openDatabase("dbclima", "1.0", "Clima App", -1);
+        }
 
-        db = $cordovaSQLite.openDB({name: "my.db"});
-
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS clima (id INTEGER PRIMARY KEY, textojson text)");
+        $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text)");
 
     });
 })
 
-function obterClimaSvc($http, $rootScope){
+function obterClimaSvc($http, $rootScope, $ionicLoading){
 
-    this.loadClima = function(params){
+    this.loadClima = function(params,funcao){
         $http.get("http://api.openweathermap.org/data/2.5/weather", {params: params}).success(
                 function(result){
                     $rootScope.$broadcast("climaApp.clima",result);
+                    $ionicLoading.hide();
             }
         ).error(function(result) {
              alert("Requisição Falhou");
@@ -43,19 +49,19 @@ function obterClimaSvc($http, $rootScope){
     }
 }
 
-function climaCtrl ($scope, $cordovaSQLite, obterClimaSvc){
+function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obterClimaSvc){
+
+    $ionicLoading.show({template: "Carregando..."});
 
     $scope.params = {q:"Lins"};
     $scope.resultado = "";
 
     $scope.insert = function(textojson) {
         var query = "insert into clima (textojson) values (?)";
-        $cordovaSQLite.execute(db, query, [texojson]).then(
+        $cordovaSQLite.execute(dbclima, query, [textojson]).then(
             function(result){
-                $scope.resultado = "INSERI COM SUCESSO";
                 console.log("INSERI");
             }, function(error){
-                $scope.resultado = "FAIO!";
                 console.log(error);
             }
         ); // fim do then
@@ -63,7 +69,7 @@ function climaCtrl ($scope, $cordovaSQLite, obterClimaSvc){
 
     $scope.select = function(textojson){
         var query = "select textojson from clima where textojson = ?";
-        $cordovaSQLite.execute(db,query,[textojson]).then(function(result) {
+        $cordovaSQLite.execute(dbclima,query,[textojson]).then(function(result) {
             if(result.rows.length > 0){
                 $scope.resultado = result.rows.item(0).textojson;
                 console.log("Achei " + result.rows.item(0).textojson);
@@ -77,46 +83,48 @@ function climaCtrl ($scope, $cordovaSQLite, obterClimaSvc){
         });
     }
 
-    $scope.$on("climaApp.clima", function(_, result) {
 
-        console.log("Cidade " + result.name);
-        console.log("Pais " + result.sys.country);
-        console.log("Lat. " + result.coord.lat);
-        console.log("Lon. " + result.coord.lon);
-        console.log("Temp. " + result.main.temp);
-        console.log("humidity " + result.main.humidity);
-        console.log("Pressure " + result.main.pressure);
-        console.log("Speed " + result.wind.speed);
-        console.log("description " + result.weather.description);
-        console.log("icon " + result.weather.icon);
+    $scope.$on("climaApp.clima", function(_, result) {
 
         $scope.name = result.name;
         $scope.country = result.sys.country;
-
         $scope.lat = result.coord.lat;
         $scope.lon = result.coord.lon;
-
-        $scope.temp = result.main.temp;
+        var tmp = result.main.temp / 10.3126;
+        $scope.temp = tmp.toFixed(2);
         $scope.pressure = result.main.pressure;
         $scope.humidity = result.main.humidity;
-
         $scope.speed = result.wind.speed;
+        result.weather.forEach(function(b) {
+            $scope.description =   b.description;
+            $scope.icon        =   "http://openweathermap.org/img/w/"+ b.icon +".png";
+        });
 
-        $scope.humidity = result.weather.description;
-        $scope.icon = result.weather.icon;
+        var query = "insert into clima (textojson) values (?)";
+        $cordovaSQLite.execute(dbclima, query, [JSON.stringify(result)]).then(
+            function(result){
+                console.log("INSERI");
+            }, function(error){
+                console.log(error);
+            }
+        ); // fim do then
 
     });
 
+
     obterClimaSvc.loadClima($scope.params);
 
+
     $scope.obterClimaParam = function(p_city){
-        console.log(p_city);
+
         if (p_city!=undefined){
+
+            $scope.params = {};
+
+            $ionicLoading.show({template: "Carregando..."});
             obterClimaSvc.loadClima({q:p_city});
         }
     }
-
-
 
 }
 
