@@ -30,7 +30,9 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
             dbclima = window.openDatabase("dbclima", "1.0", "Clima App", -1);
         }
 
+        $cordovaSQLite.execute(dbclima, "DROP TABLE clima");
         $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text)");
+
 
     });
 })
@@ -67,9 +69,9 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
         ); // fim do then
     }; // fim do insert
 
-    $scope.select = function(textojson){
-        var query = "select textojson from clima where textojson = ?";
-        $cordovaSQLite.execute(dbclima,query,[textojson]).then(function(result) {
+    $scope.select = function(){
+        var query = "select textojson from clima";
+        $cordovaSQLite.execute(dbclima,query,[]).then(function(result) {
             if(result.rows.length > 0){
                 $scope.resultado = result.rows.item(0).textojson;
                 console.log("Achei " + result.rows.item(0).textojson);
@@ -91,7 +93,7 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
         $scope.lat = result.coord.lat;
         $scope.lon = result.coord.lon;
         //Convertendo Kelvin para Celsius
-        var tmp = result.main.temp / 10.3126;
+        var tmp = result.main.temp - 273;
         $scope.temp = tmp.toFixed(2);
 
         $scope.pressure = result.main.pressure;
@@ -103,14 +105,29 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
             $scope.icon        =   "http://openweathermap.org/img/w/"+ b.icon +".png";
         });
 
-        var query = "insert into clima (textojson) values (?)";
-        $cordovaSQLite.execute(dbclima, query, [JSON.stringify(result)]).then(
-            function(result){
-                console.log("INSERI");
-            }, function(error){
-                console.log(error);
-            }
-        ); // fim do then
+        if (result.name!=null){
+
+            // Deletando os dados da tabela
+            var query = "delete from clima";
+            $cordovaSQLite.execute(dbclima, query, []).then(
+                function(result){
+                    console.log("APAGOU");
+                }, function(error){
+                    console.log(error);
+                }
+            ); // fim do then
+
+            // Inserindo os dados na tabela
+            var query = "insert into clima (textojson) values (?)";
+            $cordovaSQLite.execute(dbclima, query, [JSON.stringify(result)]).then(
+                function(result){
+                    console.log("INSERI");
+                }, function(error){
+                    console.log(error);
+                }
+            ); // fim do then
+
+        }
 
     });
 
