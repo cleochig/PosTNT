@@ -1,9 +1,34 @@
-var climaApp = angular.module("climaApp",["ionic"]);
+
+
+var climaApp = angular.module('climaApp',['ionic','ngCordova']);
+
+// Declarando a variavel para criação do banco de dados
+var db = null;
+
 
 // Criando o serviço e injetando dependencias
 climaApp.service("obterClimaSvc",["$http","$rootScope",obterClimaSvc]);
 // Criando o Controlador e injetando dependencias
-climaApp.controller("climaCtrl",["$scope","obterClimaSvc",climaCtrl]);
+climaApp.controller("climaCtrl",["$scope","$cordovaSQLite","obterClimaSvc",climaCtrl]);
+
+climaApp.run(function($ionicPlatform, $cordovaSQLite) {
+    $ionicPlatform.ready(function() {
+        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+        // for form inputs)
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        }
+        if (window.StatusBar) {
+            StatusBar.styleDefault();
+        }
+
+
+        db = $cordovaSQLite.openDB({name: "my.db"});
+
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS clima (id INTEGER PRIMARY KEY, textojson text)");
+
+    });
+})
 
 function obterClimaSvc($http, $rootScope){
 
@@ -18,9 +43,10 @@ function obterClimaSvc($http, $rootScope){
     }
 }
 
-function climaCtrl ($scope, obterClimaSvc){
+function climaCtrl ($scope, $cordovaSQLite, obterClimaSvc){
 
     $scope.params = {q:"Lins"};
+    $scope.resultado = "";
 
     $scope.$on("climaApp.clima", function(_, result) {
 
@@ -61,6 +87,27 @@ function climaCtrl ($scope, obterClimaSvc){
         }
     }
 
+    $scope.insert = function(texojson) {
+        var query = "insert into clima (texojson) values (?)";
+        $cordovaSQLite.execute(db,query,[texojson]).then(function(result) {
+            $scope.resultado = "Insert OK.";
+        }, function(error){
+            $scope.resultado = "Insert FAIL!";
+        });
+    }
+
+    $scope.select = function(texojson){
+        var query = "select texojson from clima where texojson = ?";
+        $cordovaSQLite.execute(db,query,[texojson]).then(function(result) {
+            if(result.rows.length > 0){
+                $scope.resultado = result.rows.item(0).texojson + " encontrado.";
+            } else {
+                $scope.resultado = "Texo não encontrado!";
+            }
+        }, function(error){
+            $scope.resultado = "Deu erro!";
+        });
+    }
 
 }
 
