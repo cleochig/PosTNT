@@ -46,7 +46,8 @@ function obterClimaSvc($http, $rootScope, $ionicLoading){
                     $ionicLoading.hide();
             }
         ).error(function(result) {
-             alert("Requisição Falhou");
+             //alert("Requisição Falhou");
+            $ionicLoading.hide();
         });
     }
 }
