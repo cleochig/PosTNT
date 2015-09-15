@@ -59,6 +59,8 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
     $scope.params = {q:"Lins"};
     $scope.resultado = "";
 
+    obterClimaSvc.loadClima($scope.params);
+
     $scope.insert = function(textojson) {
         var query = "insert into clima (textojson) values (?)";
         $cordovaSQLite.execute(dbclima, query, [textojson]).then(
@@ -148,9 +150,6 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
 
 
     });
-
-
-    obterClimaSvc.loadClima($scope.params);
 
 
     $scope.obterClimaParam = function(p_city){
