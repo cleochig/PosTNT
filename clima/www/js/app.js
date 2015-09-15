@@ -90,11 +90,14 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
         $scope.country = result.sys.country;
         $scope.lat = result.coord.lat;
         $scope.lon = result.coord.lon;
+        //Convertendo Kelvin para Celsius
         var tmp = result.main.temp / 10.3126;
         $scope.temp = tmp.toFixed(2);
+
         $scope.pressure = result.main.pressure;
         $scope.humidity = result.main.humidity;
         $scope.speed = result.wind.speed;
+
         result.weather.forEach(function(b) {
             $scope.description =   b.description;
             $scope.icon        =   "http://openweathermap.org/img/w/"+ b.icon +".png";
