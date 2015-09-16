@@ -8,6 +8,7 @@ var dbclima = null;
 
 // Criando o serviço e injetando dependencias
 climaApp.service("obterClimaSvc",["$http","$rootScope","$ionicLoading",obterClimaSvc]);
+
 // Criando o Controlador e injetando dependencias
 climaApp.controller("climaCtrl",["$scope","$sce","$ionicLoading","$ionicPlatform","$cordovaSQLite","obterClimaSvc",climaCtrl]);
 
@@ -31,7 +32,7 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
         }
 
         $cordovaSQLite.execute(dbclima, "DROP TABLE clima");
-        $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text)");
+        $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text, dtjson text)");
 
 
     });
@@ -58,6 +59,12 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
 
     $scope.params = {q:"Lins"};
     $scope.resultado = "";
+
+    var date = new Date();
+    var month = date.getMonth()+ 1;
+    $scope.dateString = date.getDate() + "/" + month + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
+
+    console.log($scope.dateString);
 
     obterClimaSvc.loadClima($scope.params);
 
@@ -104,8 +111,8 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
             ); // fim do then
 
             // Inserindo os dados na tabela
-            var query = "insert into clima (textojson) values (?)";
-            $cordovaSQLite.execute(dbclima, query, [JSON.stringify(result)]).then(
+            var query = "insert into clima (textojson,dtjson) values (?,?)";
+            $cordovaSQLite.execute(dbclima, query, [JSON.stringify(result),$scope.dateString]).then(
                 function(result){
                     console.log("INSERI");
                 }, function(error){
@@ -115,11 +122,13 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
         }
 
         // Buscando os dados na tabela
-        var query = "select textojson from clima";
+        var query = "select textojson, dtjson from clima";
         $cordovaSQLite.execute(dbclima,query,[]).then(function(result) {
             if(result.rows.length > 0){
 
                 var climaJson = JSON.parse(result.rows.item(0).textojson);
+
+                $scope.dtclimaJson = result.rows.item(0).dtjson;
 
                 $scope.name = climaJson.name;
                 $scope.country = climaJson.sys.country;
