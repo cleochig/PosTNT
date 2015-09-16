@@ -65,6 +65,11 @@
                         <input type="text" placeholder="Informe o nome da cidade" data-ng-model="p_city">
                     </label>
 
+                    <label class="item item-input" name="dtclimaJson">
+                        <span class="input-label">Ultima atualização</span>
+                        <input type="text" readonly value="{{dtclimaJson}}">
+                    </label>
+
                 </form>
 
                 <button class="button button-positive button-block" ng-click="obterClimaParam(p_city)">Pesquisar</button>
