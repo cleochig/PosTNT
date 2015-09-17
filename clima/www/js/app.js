@@ -34,8 +34,10 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
         $cordovaSQLite.execute(dbclima, "DROP TABLE clima");
         $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text, dtjson text)");
 
-
     });
+
+
+
 })
 
 function obterClimaSvc($http, $rootScope, $ionicLoading){
@@ -56,6 +58,7 @@ function obterClimaSvc($http, $rootScope, $ionicLoading){
 function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obterClimaSvc){
 
     $ionicLoading.show({template: "Carregando..."});
+
 
     $scope.params = {q:"Lins"};
     $scope.resultado = "";
@@ -173,4 +176,3 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
     }
 
 }
-
