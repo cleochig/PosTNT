@@ -31,7 +31,6 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
             dbclima = window.openDatabase("dbclima", "1.0", "Clima App", -1);
         }
 
-        $cordovaSQLite.execute(dbclima, "DROP TABLE clima");
         $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text, dtjson text)");
 
     });
@@ -50,6 +49,7 @@ function obterClimaSvc($http, $rootScope, $ionicLoading){
             }
         ).error(function(result) {
              //alert("Requisição Falhou");
+            $rootScope.$broadcast("climaApp.clima",result);
             $ionicLoading.hide();
         });
     }
@@ -70,7 +70,7 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
     console.log($scope.dateString);
 
     obterClimaSvc.loadClima($scope.params);
-
+/*
     $scope.insert = function(textojson) {
         var query = "insert into clima (textojson) values (?)";
         $cordovaSQLite.execute(dbclima, query, [textojson]).then(
@@ -97,10 +97,12 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
             console.log(error);
         });
     }
-
+*/
 
     $scope.$on("climaApp.clima", function(_, result) {
 
+        console.log("Aqui 01");
+        // Verifica se teve retorno do serviço http
         if (result.name!=null){
 
             // Deletando os dados da tabela
