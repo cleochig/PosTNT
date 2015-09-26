@@ -5,6 +5,7 @@ var climaApp = angular.module('climaApp',['ionic','ngCordova']);
 // Declarando a variavel para criação do banco de dados
 var dbclima = null;
 
+var conn = true;
 
 // Criando o serviço e injetando dependencias
 climaApp.service("obterClimaSvc",["$http","$rootScope","$ionicLoading",obterClimaSvc]);
@@ -12,7 +13,7 @@ climaApp.service("obterClimaSvc",["$http","$rootScope","$ionicLoading",obterClim
 // Criando o Controlador e injetando dependencias
 climaApp.controller("climaCtrl",["$scope","$sce","$ionicLoading","$ionicPlatform","$cordovaSQLite","obterClimaSvc",climaCtrl]);
 
-climaApp.run(function($ionicPlatform, $cordovaSQLite) {
+climaApp.run(function($ionicPlatform, $cordovaSQLite, $ionicPopup) {
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -26,12 +27,27 @@ climaApp.run(function($ionicPlatform, $cordovaSQLite) {
         if(window.cordova) {
             // App syntax
             dbclima = $cordovaSQLite.openDB("dbclima");
+
         } else {
             // Ionic serve syntax
             dbclima = window.openDatabase("dbclima", "1.0", "Clima App", -1);
         }
 
         $cordovaSQLite.execute(dbclima, "CREATE TABLE IF NOT EXISTS clima (textojson text, dtjson text)");
+
+        if(window.Connection) {
+            if(navigator.connection.type == Connection.NONE) {
+                conn = false;
+                $ionicPopup.confirm({   title: "Sem acesso a Internet",
+                                        content: "Seu dispositivo esta sem internet."
+                    })
+                    .then(function(result) {
+                        if(!result) {
+                            ionic.Platform.exitApp();
+                        }
+                    });
+                }
+        }
 
     });
 
@@ -49,7 +65,6 @@ function obterClimaSvc($http, $rootScope, $ionicLoading){
             }
         ).error(function(result) {
              //alert("Requisição Falhou");
-            $rootScope.$broadcast("climaApp.clima",result);
             $ionicLoading.hide();
         });
     }
@@ -68,8 +83,14 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
     $scope.dateString = date.getDate() + "/" + month + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
 
     console.log($scope.dateString);
+    console.log(conn);
 
-    obterClimaSvc.loadClima($scope.params);
+    if(conn){
+       obterClimaSvc.loadClima($scope.params);
+    }else{
+       obteDadosBd();
+    }
+
 /*
     $scope.insert = function(textojson) {
         var query = "insert into clima (textojson) values (?)";
@@ -126,6 +147,13 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
             ); // fim do then
         }
 
+        $scope.obteDadosBd();
+
+    });
+
+
+    $scope.obteDadosBd = function(){
+
         // Buscando os dados na tabela
         var query = "select textojson, dtjson from clima";
         $cordovaSQLite.execute(dbclima,query,[]).then(function(result) {
@@ -162,8 +190,7 @@ function climaCtrl ($scope,$sce,$ionicLoading,$ionicPlatform,$cordovaSQLite,obte
             console.log(error);
         });
 
-
-    });
+    }
 
 
     $scope.obterClimaParam = function(p_city){
