@@ -1,0 +1,15 @@
+<ion-view view-title="Anúncios de Imóveis" name="login-view">
+  <ion-content class="padding">
+    <div ng-controller="loginCtrl">
+      <div class="list list-inset">
+          <label class="item item-input">
+              <input type="text" placeholder="Usuário" ng-model="username">
+          </label>
+          <label class="item item-input">
+              <input type="password" placeholder="Senha" ng-model="password">
+          </label>
+      </div>
+      <button class="button button-block" ng-click="login(username, password)">Entrar</button>
+    </div>
+  </ion-content>
+</ion-view>

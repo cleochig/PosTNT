@@ -1,0 +1,47 @@
+<ion-view view-title="Situações" name="situacao-view" ng-controller="situacaoCtrl">
+
+  <ion-nav-buttons side="right">
+    <button class="button icon-left ion-refresh button-stable" ng-click="obterSituacao()">Listar</button>
+    <button class="button icon-left ion-log-out button-stable" ng-click="logout()">Logout</button>
+  </ion-nav-buttons>
+
+  <ion-content class="padding">
+
+  <div class="row">
+    <div class="col col-10">ID</div>
+    <div class="col">Denominação</div>
+    <div class="col">Descrição</div>
+  </div>
+
+  <ion-list>
+    <ion-item ng-repeat="sit in resultSit">
+        <div class="row">
+            <div class="col col-10">{{sit.id}}</div>
+            <div class="col">{{sit.denominacao}}</div>
+            <div class="col">{{sit.descricao}}</div>
+            <div class="col">
+                <ion-option-button class="button-assertive icon ion-edit" ng-click="listEdit(sit.id,sit.denominacao,sit.descricao)" ></ion-option-button>
+                <ion-option-button class="button-assertive icon ion-trash-a" ng-click="deleteSituacao(sit.id)"></ion-option-button>
+            </div>
+        </div>
+    </ion-item>
+  </ion-list>
+
+  <div class="row">
+    <div class="col col-10">
+        <input type="text" placeholder="ID" readonly data-ng-model="item.id">
+    </div>
+    <div class="col">
+        <input type="text" placeholder="Denominação" data-ng-model="item.denominacao">
+    </div>
+    <div class="col">
+        <input type="text" placeholder="Descrição" data-ng-model="item.descricao">
+    </div>
+
+    <button class="button button-positive" ng-click="salvarSituacao(item.id,item.denominacao,item.descricao)">Salvar</button>
+    <button class="button button-positive" ng-click="limparEdit()">Limpar</button>
+
+  </div>
+
+  </ion-content>
+</ion-view>
